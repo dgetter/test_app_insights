@@ -8,27 +8,19 @@ import os
 app = FastAPI()
 APPLICATIONINSIGHTS_CONNECTION_STRING = ""
 
-
-
 # Configure Azure Monitor OpenTelemetry
 connection_string = APPLICATIONINSIGHTS_CONNECTION_STRING
 if connection_string:
     configure_azure_monitor(connection_string=connection_string)
 
 # Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# Add console handler for local debugging
-console_handler = logging.StreamHandler()
-logger.addHandler(console_handler)
-
 
 # Define request model
 class Item(BaseModel):
     name: str
     description: str = None
-
 
 @app.post("/items/")
 async def create_item(item: Item, request: Request):
@@ -40,8 +32,6 @@ async def create_item(item: Item, request: Request):
     logger.info(f"Item created successfully: {item.name}")
     return result
 
-
 if __name__ == "__main__":
     import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
